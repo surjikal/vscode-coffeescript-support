@@ -28,7 +28,7 @@ export class IndexService {
     console.log(new Date(), 'index with sub processes');
 
     return new Promise((resolve) => {
-      this.indexer.once('message', (params) => {
+      this.indexer.once('message', (params: any) => {
         if (params.done) {
           resolve();
         }
@@ -60,7 +60,7 @@ export class IndexService {
     console.info('Starting indexer process...');
     this.indexerProcess = this.startIndexer(INDEXER_CLI_PATH, this.dbFilename);
 
-    this.indexerProcess.on('message', (params) => {
+    this.indexerProcess.on('message', (params: any) => {
       if (params.done) {
         console.info(new Date(), 'Indexer done');
       } else {
