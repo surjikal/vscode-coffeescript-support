@@ -50,6 +50,7 @@ connection.onInitialize((_): InitializeResult => {
       textDocumentSync: TextDocumentSyncKind.Full,
       documentSymbolProvider: true,
       workspaceSymbolProvider: true,
+      definitionProvider: true,
     },
   };
 });
@@ -57,6 +58,49 @@ connection.onInitialize((_): InitializeResult => {
 connection.onRequest('custom/addFiles', (params) => {
   console.info('Will index', params.files.length, 'files');
   indexService.indexFilesInBackground(params.files);
+});
+
+
+// FIXME: Most of this code should probably be in the LSP?
+connection.onDefinition(async (params) => {
+
+  let doc = documents.get(params.textDocument.uri);
+  if (!doc) return;
+
+  // FIXME: Use os line delimiters?
+  let text = doc.getText().split('\n');
+  let line = text[params.position.line];
+
+  // FIXME: Use language word delimiters?
+  let wordSep = new RegExp('[' + ' ~!@#$%^&*()-=+[{]}\\|;:\'",.<>/?]'.split('').join('|\\') + ']');
+
+  let start = params.position.character;
+  let end   = params.position.character;
+
+  while (true) {
+    let char = line[start];
+    if (!char) break;
+    if (wordSep.test(char)) {
+      start += 1;
+      break;
+    };
+    if (start == 0) break;
+    start--;
+  }
+  while (true) {
+    let char = line[end];
+    if (!char) break;
+    if (wordSep.test(char)) break;
+    if (end == line.length) break;
+    end++;
+  }
+
+  let query = line.slice(start, end);
+
+  console.log("Querying index:", query);
+  let symbols = await indexService.find(query);
+
+  return symbols.map(x => x.location);
 });
 
 // The content of a text document has changed. This event is emitted
