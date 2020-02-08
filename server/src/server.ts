@@ -7,11 +7,16 @@
 import * as tmp from 'tmp';
 
 import {
-  IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments,
+  IPCMessageReader, IPCMessageWriter, createConnection, IConnection,
+  TextDocuments, TextDocumentSyncKind,
   InitializeResult,
   SymbolInformation,
-  FileChangeType,
+  FileChangeType
 } from 'vscode-languageserver';
+
+import {
+  TextDocument,
+} from 'vscode-languageserver-textdocument';
 
 import { Parser } from 'coffeescript-lsp-core';
 import { IndexService } from './lib/IndexService';
@@ -21,7 +26,9 @@ const connection: IConnection = createConnection(new IPCMessageReader(process), 
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
-const documents: TextDocuments = new TextDocuments();
+const documents = new TextDocuments(TextDocument);
+
+
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
@@ -40,7 +47,7 @@ connection.onInitialize((_): InitializeResult => {
   return {
     capabilities: {
       // Tell the client that the server works in FULL text document sync mode
-      textDocumentSync: documents.syncKind,
+      textDocumentSync: TextDocumentSyncKind.Full,
       documentSymbolProvider: true,
       workspaceSymbolProvider: true,
     },

@@ -14,13 +14,14 @@
   "dependencies": {
     "coffeescript-lsp-core": "chitsaou/coffeescript-lsp-core#v1.3.0",
     "tmp": "0.0.33",
-    "vscode-languageserver": "^5.0.0"
+    "vscode-languageserver": "^6.0.0"
   },
   "scripts": {
     "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^24.0.13",
+    "@types/node": "^13.7.0",
     "@types/tmp": "0.0.33",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
